@@ -3,13 +3,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import os
 
 # ===============================
 # STEP 1: Load & Persiapkan Data
 # ===============================
 # Asumsi data sudah melalui proses cleaning seperti pada instruksi analisis
 # dan disimpan sebagai cleaned_hourData.csv.
-hour_data = pd.read_csv('cleaned_hourData.csv')
+
+base_path = os.path.dirname(__file__)  # Lokasi file dashboard.py
+file_path = os.path.join(base_path, 'cleaned_hourData.csv')
+hour_data = pd.read_csv(file_path)
 
 # ===============================
 # STEP 2: Membuat Grafik Utama
