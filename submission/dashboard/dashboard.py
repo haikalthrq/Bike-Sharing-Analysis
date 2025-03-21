@@ -9,7 +9,7 @@ import numpy as np
 # ===============================
 # Asumsi data sudah melalui proses cleaning seperti pada instruksi analisis
 # dan disimpan sebagai cleaned_hourData.csv.
-hour_data = pd.read_csv('submission\dashboard\cleaned_hourData.csv')
+hour_data = pd.read_csv('cleaned_hourData.csv')
 
 # ===============================
 # STEP 2: Membuat Grafik Utama
