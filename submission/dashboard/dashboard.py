@@ -8,9 +8,6 @@ import os
 # ===============================
 # STEP 1: Load & Persiapkan Data
 # ===============================
-# Asumsi data sudah melalui proses cleaning seperti pada instruksi analisis
-# dan disimpan sebagai cleaned_hourData.csv.
-
 base_path = os.path.dirname(__file__)  # Lokasi file dashboard.py
 file_path = os.path.join(base_path, 'cleaned_hourData.csv')
 hour_data = pd.read_csv(file_path)
@@ -72,7 +69,7 @@ ax_q1.grid(True)
 ax_q1.set_xticks(np.arange(0, 24, 1))
 st.pyplot(fig_q1)
 
-st.markdown("""
+st.markdown(""" 
 Grafik menunjukkan bahwa peminjaman sepeda mengalami peningkatan pada jam sibuk, khususnya pada pagi (misalnya 6-9) dan sore hari (misalnya 17-19).  
 Pengguna casual dan registered menunjukkan pola yang mirip, meskipun pengguna registered cenderung memiliki jumlah peminjaman yang lebih tinggi.
 """)
@@ -122,4 +119,54 @@ st.pyplot(fig_q3)
 st.markdown(""" 
 Grafik mengungkapkan bahwa musim gugur (Fall) mencatat jumlah peminjaman tertinggi, sedangkan musim semi (Spring) menunjukkan angka peminjaman yang paling rendah.  
 Hal ini dapat menjadi dasar bagi strategi operasional dan pemasaran untuk menyesuaikan penawaran sesuai musim.
+""")
+
+# ============================
+# Analisis Lanjutan: Clustering Manual Berdasarkan Waktu
+# ============================
+
+st.markdown("## Analisis Lanjutan: Clustering Manual Berdasarkan Waktu")
+
+# Membuat kategori waktu: Pagi, Siang, Sore, Malam berdasarkan jam
+def time_of_day(hour):
+    if 6 <= hour < 12:
+        return 'Pagi'
+    elif 12 <= hour < 18:
+        return 'Siang'
+    elif 18 <= hour < 21:
+        return 'Sore'
+    else:
+        return 'Malam'
+
+# Menambahkan kolom 'time_of_day' berdasarkan jam
+filtered_data['time_of_day'] = filtered_data['hr'].apply(time_of_day)
+
+# Mengelompokkan berdasarkan waktu
+time_activity = filtered_data.groupby('time_of_day').agg({'casual': 'sum', 'registered': 'sum'}).reset_index()
+
+# Menampilkan hasil pengelompokan
+st.write(time_activity)
+
+# Membuat grafik untuk visualisasi pengelompokan berdasarkan waktu
+fig_clustering, ax_clustering = plt.subplots(figsize=(8, 6))
+
+# Plot bar chart untuk aktivitas peminjaman berdasarkan waktu
+time_activity.set_index('time_of_day')[['casual', 'registered']].plot(kind='bar', stacked=True, ax=ax_clustering, color=['#1f77b4', '#ff7f0e'])
+
+ax_clustering.set_title('Pengelompokan Aktivitas Peminjaman Sepeda Berdasarkan Waktu dalam Sehari')
+ax_clustering.set_xlabel('Kategori Waktu')
+ax_clustering.set_ylabel('Jumlah Peminjaman')
+ax_clustering.legend(title='Tipe Pengguna', labels=['Casual', 'Registered'])
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# Tampilkan plot
+st.pyplot(fig_clustering)
+
+# Insight
+st.markdown("""
+**Insight:**
+- Berdasarkan grafik, kita dapat melihat bahwa peminjaman sepeda paling tinggi terjadi pada sore dan pagi hari, sedangkan pada malam hari lebih sedikit.
+- Pengguna **registered** memiliki kontribusi yang lebih besar dalam semua kategori waktu dibandingkan pengguna **casual**, terutama di pagi dan sore hari.
+- Hal ini memberikan informasi yang berguna bagi strategi operasional, seperti menambah armada sepeda pada jam-jam sibuk.
 """)
