@@ -165,6 +165,6 @@ st.pyplot(fig_clustering)
 
 # Insight
 st.markdown("""
-- Berdasarkan grafik di atas, kita dapat melihat bahwa peminjaman sepeda paling tinggi terjadi pada siang hari (Pagi dan Sore), sedangkan pada malam hari cenderung lebih sedikit.
+- Berdasarkan grafik di atas, kita dapat melihat bahwa peminjaman sepeda paling tinggi terjadi pada siang hari, sedangkan pada malam hari cenderung lebih sedikit.
 - Pengguna **registered** memiliki kontribusi yang lebih besar dalam semua kategori waktu dibandingkan pengguna **casual**.
 """)
