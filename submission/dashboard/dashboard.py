@@ -15,11 +15,29 @@ base_path = os.path.dirname(__file__)  # Lokasi file dashboard.py
 file_path = os.path.join(base_path, 'cleaned_hourData.csv')
 hour_data = pd.read_csv(file_path)
 
+# Konversi kolom 'dteday' menjadi datetime untuk filter
+hour_data['dteday'] = pd.to_datetime(hour_data['dteday'])
+
 # ===============================
-# STEP 2: Membuat Grafik Utama
+# STEP 2: Menambahkan Fitur Interaktif - Filter Berdasarkan Tanggal
 # ===============================
-# Grafik utama: Line chart aktivitas peminjaman sepeda sepanjang hari.
-hourly_activity = hour_data.groupby('hr').agg({'casual': 'sum', 'registered': 'sum'}).reset_index()
+st.title("Analisis Data Bike Sharing")
+
+# Menambahkan fitur filter berdasarkan tanggal
+st.sidebar.header("Filter Berdasarkan Tanggal")
+start_date = st.sidebar.date_input("Pilih Tanggal Mulai", hour_data['dteday'].min())
+end_date = st.sidebar.date_input("Pilih Tanggal Akhir", hour_data['dteday'].max())
+
+# Filter data berdasarkan rentang tanggal yang dipilih
+filtered_data = hour_data[(hour_data['dteday'] >= pd.to_datetime(start_date)) & (hour_data['dteday'] <= pd.to_datetime(end_date))]
+
+st.markdown(f"**Menampilkan data dari {start_date} hingga {end_date}**")
+
+# ===============================
+# STEP 3: Membuat Grafik Utama
+# ===============================
+# Grafik utama: Line chart aktivitas peminjaman sepeda sepanjang hari berdasarkan filter tanggal
+hourly_activity = filtered_data.groupby('hr').agg({'casual': 'sum', 'registered': 'sum'}).reset_index()
 
 fig_main, ax_main = plt.subplots(figsize=(14, 6))
 ax_main.plot(hourly_activity['hr'], hourly_activity['casual'], label='Peminjaman Casual', marker='o')
@@ -32,9 +50,8 @@ ax_main.grid(True)
 ax_main.set_xticks(np.arange(0, 24, 1))
 
 # ===============================
-# STEP 3: Menyusun Tampilan Dashboard
+# STEP 4: Menyusun Tampilan Dashboard
 # ===============================
-st.title("Analisis Data Bike Sharing")
 st.pyplot(fig_main)
 
 # ------------------------------------------------
@@ -66,9 +83,8 @@ Pengguna casual dan registered menunjukkan pola yang mirip, meskipun pengguna re
 st.markdown("## Pertanyaan 2")
 st.markdown("**Bagaimana cuaca mempengaruhi jumlah penyewaan sepeda?**")
 
-
 # Grafik untuk pertanyaan 2: Stacked Bar Chart berdasarkan cuaca
-weather_activity = hour_data.groupby('weathersit').agg({'casual': 'sum', 'registered': 'sum'}).reset_index()
+weather_activity = filtered_data.groupby('weathersit').agg({'casual': 'sum', 'registered': 'sum'}).reset_index()
 
 fig_q2, ax_q2 = plt.subplots(figsize=(10, 6))
 # Membuat stacked bar chart
@@ -92,7 +108,7 @@ st.markdown("## Pertanyaan 3")
 st.markdown("**Bagaimana musim mempengaruhi jumlah penyewaan sepeda?**")
 
 # Grafik untuk pertanyaan 3: Grouped Bar Chart berdasarkan musim
-season_activity = hour_data.groupby('season').agg({'casual': 'sum', 'registered': 'sum'}).reset_index()
+season_activity = filtered_data.groupby('season').agg({'casual': 'sum', 'registered': 'sum'}).reset_index()
 
 fig_q3, ax_q3 = plt.subplots(figsize=(10, 6))
 season_activity.set_index('season')[['casual', 'registered']].plot(kind='bar', ax=ax_q3, legend=True)
